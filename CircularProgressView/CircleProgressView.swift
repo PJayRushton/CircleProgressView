@@ -1,6 +1,6 @@
 //
-//  CircularProgressView.swift
-//  CircularProgressView
+//  CircleProgressView.swift
+//  CircleProgressView
 //
 //  Created by Parker Rushton on 2/24/16.
 //  Copyright © 2016 AppsByPJ. All rights reserved.
@@ -14,12 +14,14 @@ protocol ProgressViewObjectType {
     var progress: Float { get }
 }
 
-@IBDesignable class CircularProgressView: UIView {
+@IBDesignable class CircleProgressView: UIView {
     
     // MARK: - Constants
 
     private let topLabel = UILabel()
     private let bottomLabel = UILabel()
+    static let futuraLarge = UIFont(name: "Futura", size: 30)!
+    static let futuraSmall = UIFont(name: "Futura", size: 17)!
     
     
     // MARK: - IBInspectables
@@ -36,24 +38,44 @@ protocol ProgressViewObjectType {
         }
     }
     
+    @IBInspectable var showLabel: Bool = true {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable var labelColor: UIColor = UIColor.blackColor() {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
     @IBInspectable var lineWidth: CGFloat = 20.0 {
         didSet {
             setNeedsDisplay()
         }
     }
-    @IBInspectable private var total: CGFloat = 0 {
+    @IBInspectable private var total: CGFloat = 10.0 {
         didSet {
-            updateLabels()
             setNeedsDisplay()
-            layoutIfNeeded()
         }
     }
     
-    @IBInspectable var progress: CGFloat = 0 {
+    @IBInspectable var progress: CGFloat = 7.0 {
         didSet {
-            updateLabels()
             setNeedsDisplay()
-            layoutIfNeeded()
+        }
+    }
+    
+    var numberFont: UIFont = CircleProgressView.futuraLarge {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    var textFont: UIFont = CircleProgressView.futuraSmall {
+        didSet {
+            setNeedsDisplay()
         }
     }
     
@@ -66,11 +88,13 @@ protocol ProgressViewObjectType {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         createLabels()
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        
         createLabels()
     }
     
@@ -86,6 +110,7 @@ protocol ProgressViewObjectType {
         // Draw the progress track
         let endAngle = CGFloat(2 * M_PI * Double(progressPercentage) - (M_PI / 2))
         fillTrack(center: centerPoint, radius: radius, startAngle: CGFloat(-M_PI / 2), endAngle: endAngle, color: progressTintColor)
+        updateLabels()
     }
     
     
@@ -98,7 +123,7 @@ protocol ProgressViewObjectType {
     
 }
 
-private extension CircularProgressView {
+private extension CircleProgressView {
     
     func createLabels() {
         let stackView = UIStackView(arrangedSubviews: [topLabel, bottomLabel])
@@ -115,16 +140,21 @@ private extension CircularProgressView {
     }
     
     func updateLabels() {
+        topLabel.hidden = !showLabel
+        bottomLabel.hidden = !showLabel
+        topLabel.textColor = labelColor
+        bottomLabel.textColor = labelColor
         topLabel.attributedText = weightRemainingLabelText()
         bottomLabel.text = "left to lose"
+        bottomLabel.font = textFont
     }
     
     func weightRemainingLabelText() -> NSAttributedString {
-        let poundsString = "\(total - progress)"
-        let remainingString = poundsString + " lbs"
-        let poundsRange = (remainingString as NSString).rangeOfString(poundsString)
-        let attributedString = NSMutableAttributedString(string: remainingString, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(20.0)])
-        attributedString.setAttributes([NSFontAttributeName: UIFont.systemFontOfSize(30.0, weight: 7)], range: poundsRange)
+        let numberString = "\(total - progress)"
+        let subtitleString = numberString + " lbs"
+        let poundsRange = (subtitleString as NSString).rangeOfString(numberString)
+        let attributedString = NSMutableAttributedString(string: subtitleString, attributes: [NSFontAttributeName: textFont])
+        attributedString.setAttributes([NSFontAttributeName: numberFont], range: poundsRange)
         
         return attributedString
     }
