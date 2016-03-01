@@ -16,8 +16,13 @@ protocol ProgressViewObjectType {
 
 @IBDesignable class CircularProgressView: UIView {
     
+    // MARK: - Constants
+
     private let topLabel = UILabel()
     private let bottomLabel = UILabel()
+    
+    
+    // MARK: - IBInspectables
     
     @IBInspectable var trackTintColor: UIColor = UIColor.lightGrayColor() {
         didSet {
@@ -36,7 +41,7 @@ protocol ProgressViewObjectType {
             setNeedsDisplay()
         }
     }
-    @IBInspectable private var total: Float = 0 {
+    @IBInspectable private var total: CGFloat = 0 {
         didSet {
             updateLabels()
             setNeedsDisplay()
@@ -44,7 +49,7 @@ protocol ProgressViewObjectType {
         }
     }
     
-    @IBInspectable var progress: Float = 0 {
+    @IBInspectable var progress: CGFloat = 0 {
         didSet {
             updateLabels()
             setNeedsDisplay()
@@ -53,8 +58,11 @@ protocol ProgressViewObjectType {
     }
     
     private var progressPercentage: CGFloat {
-        return CGFloat(progress / total)
+        return progress / total
     }
+    
+    
+    // MARK: - Overrides
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -80,9 +88,12 @@ protocol ProgressViewObjectType {
         fillTrack(center: centerPoint, radius: radius, startAngle: CGFloat(-M_PI / 2), endAngle: endAngle, color: progressTintColor)
     }
     
+    
+    // MARK: - Public funcs
+    
     func update(progressObject: ProgressViewObjectType) {
-        total = progressObject.total
-        progress = progressObject.progress
+        total = CGFloat(progressObject.total)
+        progress = CGFloat(progressObject.progress)
     }
     
 }
@@ -90,17 +101,17 @@ protocol ProgressViewObjectType {
 private extension CircularProgressView {
     
     func createLabels() {
-        topLabel.backgroundColor = .blueColor()
         let stackView = UIStackView(arrangedSubviews: [topLabel, bottomLabel])
+        updateLabels()
         stackView.axis = .Vertical
         stackView.distribution = .Fill
+        stackView.alignment = .Center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
-        updateLabels()
-        
+
         addConstraint(leadingAnchor.constraintEqualToAnchor(stackView.leadingAnchor))
         addConstraint(trailingAnchor.constraintEqualToAnchor(stackView.trailingAnchor))
-        addConstraint(topAnchor.constraintEqualToAnchor(stackView.topAnchor))
-        addConstraint(bottomAnchor.constraintEqualToAnchor(stackView.bottomAnchor))
+        addConstraint(centerYAnchor.constraintEqualToAnchor(stackView.centerYAnchor))
     }
     
     func updateLabels() {
@@ -123,10 +134,7 @@ private extension CircularProgressView {
         let path = UIBezierPath()
         path.lineWidth = lineWidth
         path.addArcWithCenter(center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
-        
-        UIView.animateWithDuration(0.4) {
-            path.stroke()
-        }
+        path.stroke()
     }
     
 }
