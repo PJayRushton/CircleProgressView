@@ -8,12 +8,6 @@
 
 import UIKit
 
-protocol ProgressViewObjectType {
-    
-    var total: Float { get }
-    var progress: Float { get }
-}
-
 @IBDesignable class CircleProgressView: UIView {
     
     // MARK: - Constants
@@ -61,7 +55,7 @@ protocol ProgressViewObjectType {
         }
     }
     
-    @IBInspectable var progress: CGFloat = 7.0 {
+    @IBInspectable var current: CGFloat = 7.0 {
         didSet {
             setNeedsDisplay()
         }
@@ -80,7 +74,7 @@ protocol ProgressViewObjectType {
     }
     
     private var progressPercentage: CGFloat {
-        return progress / total
+        return current / total
     }
     
     
@@ -116,9 +110,9 @@ protocol ProgressViewObjectType {
     
     // MARK: - Public funcs
     
-    func update(progressObject: ProgressViewObjectType) {
-        total = CGFloat(progressObject.total)
-        progress = CGFloat(progressObject.progress)
+    func update(total: Double, current: Double) {
+        self.total = CGFloat(total)
+        self.current = CGFloat(current)
     }
     
 }
@@ -150,7 +144,7 @@ private extension CircleProgressView {
     }
     
     func weightRemainingLabelText() -> NSAttributedString {
-        let numberString = "\(total - progress)"
+        let numberString = "\(total - current)"
         let subtitleString = numberString + " lbs"
         let poundsRange = (subtitleString as NSString).rangeOfString(numberString)
         let attributedString = NSMutableAttributedString(string: subtitleString, attributes: [NSFontAttributeName: textFont])

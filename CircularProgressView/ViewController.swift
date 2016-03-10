@@ -14,13 +14,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var progressSlider: UISlider!
     @IBOutlet weak var widthSlider: UISlider!
     
-    var goal = Goal(type: .Weight, target: 140)
+    let total = 10.0
+    var current = 3.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        goal.weighIns = [WeighIn(weight: 150), WeighIn(weight: 148), WeighIn(weight: 143)]
-        progressSlider.maximumValue = Float(goal.targetLoss!)
-        progressSlider.setValue(goal.progress, animated: false)
+        progressSlider.maximumValue = Float(total)
+        progressSlider.setValue(Float(current), animated: false)
         widthSlider.maximumValue = Float(circleProgressView.frame.size.width / 2)
         widthSlider.setValue(Float(circleProgressView.lineWidth), animated: false)
     }
@@ -28,14 +28,14 @@ class ViewController: UIViewController {
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
-        circleProgressView.update(goal)
+        circleProgressView.update(total, current: current)
     }
     
     @IBAction func progressSliderValueChanged(sender: UISlider) {
         let intSliderValue = Int(sender.value)
         sender.setValue(Float(intSliderValue), animated: true)
-        goal.weighIns[2] = (WeighIn(weight: goal.weighIns.first!.weight - intSliderValue))
-        circleProgressView.update(goal)
+        current = Double(intSliderValue)
+        circleProgressView.update(total, current: current)
     }
 
     @IBAction func widthSliderValueChanged(sender: UISlider) {
